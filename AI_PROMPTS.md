@@ -78,3 +78,17 @@
 > Run every command documented in the README. Do not create a Git commit. Report any documentation problem corrected and the final coverage results.
 
 I reviewed and tested all generated changes.
+
+## Prompt 6A
+
+> Read the repository instructions and preserve all current behavior. Add this complete prompt to AI_PROMPTS.md as Prompt 6A.
+>
+> Add the smallest maintainable Docker setup that allows an evaluator to run the React frontend and Go backend together. Use production-oriented builds, correct service configuration, and no secrets.
+>
+> Add clear Docker instructions to the README. Build and run the complete stack locally. Verify the health endpoint and one successful browser calculation. Then rerun the existing non-Docker tests and builds.
+>
+> Do not change the application architecture or add unrelated tooling.
+>
+> If Docker cannot be successfully tested in this environment, remove the unverified configuration and report that Docker was intentionally omitted.
+>
+> Do not create a Git commit.
