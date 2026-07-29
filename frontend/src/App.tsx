@@ -140,6 +140,11 @@ export function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === " " || event.code === "Space" || event.code === "Spacebar") {
+        event.preventDefault();
+        return;
+      }
+
       if (/^[0-9]$/.test(event.key)) enterDigit(event.key);
       else if (event.key === ".") enterDecimal();
       else if (event.key in operationKeys)
