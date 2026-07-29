@@ -9,6 +9,8 @@ A small take-home calculator built as a minimal monorepo. The UI uses React 18, 
 ├── backend/             # Go calculator, HTTP handlers, configuration, and tests
 ├── frontend/            # React UI, typed API client, styles, and Vitest tests
 ├── docs/COVERAGE.md     # Current measured coverage and intentional gaps
+├── compose.yaml         # Production frontend/backend stack
+├── .dockerignore        # Minimal container build context
 ├── AGENTS.md            # Assignment and repository rules
 ├── AI_PROMPTS.md        # Prompts used to produce and verify the project
 ├── PLAN.md              # Architecture and implementation plan
@@ -23,6 +25,7 @@ A small take-home calculator built as a minimal monorepo. The UI uses React 18, 
 - Go 1.22 or newer.
 - Node.js 20.19 or newer and npm. Verification used Node 20.20.1 and npm 10.8.2.
 - `curl` for the API examples.
+- Docker Engine with Docker Compose for the optional container workflow.
 
 ## Setup and run
 
@@ -48,6 +51,30 @@ npm run dev
 
 Open `http://localhost:5173`. The backend health endpoint is `http://localhost:8080/api/health`.
 
+## Docker
+
+Docker Desktop (or another Docker Engine with Compose) can build and run the production stack with one command from the repository root:
+
+```sh
+docker compose up --build -d
+```
+
+Open `http://localhost:8081`. Nginx serves the compiled React assets and proxies `/api` to the internal Go service; the backend is not published on the host.
+
+Check container state and the proxied health endpoint:
+
+```sh
+docker compose ps
+curl http://localhost:8081/api/health
+```
+
+Stop and remove the stack:
+
+```sh
+docker compose down
+```
+
+No secrets or local environment files are copied into the images. Compose supplies only the backend port and allowed browser origin.
 ## Environment variables
 
 | Variable | Application | Default | Purpose |
@@ -115,4 +142,4 @@ Operands and results are IEEE-754 `float64` values. This is appropriate for a ge
 
 ## Tradeoffs and future improvements
 
-The project favors reviewability and the four-hour scope over deployment infrastructure and advanced features. Given more time, useful improvements would include end-to-end browser tests in CI, configurable multi-origin CORS, request logging/observability, decimal or arbitrary-precision modes for specialized domains, and deployment manifests. Advanced operations and frontend arithmetic fall outside the assignment.
+The project favors reviewability and the four-hour scope over deployment infrastructure and advanced features. Given more time, useful improvements would include end-to-end browser tests in CI, configurable multi-origin CORS, request logging/observability, decimal or arbitrary-precision modes for specialized domains, and production TLS/orchestration configuration. Advanced operations and frontend arithmetic fall outside the assignment.
