@@ -3,7 +3,7 @@
 ## Proposed architecture
 
 - A small npm-workspaces monorepo with `frontend` and `backend` applications.
-- The frontend is a responsive Vite-powered React TypeScript calculator with a typed API client, a focused state hook, and presentational components.
+- The frontend is a responsive Vite-powered React TypeScript calculator with a typed API client and focused component state.
 - The backend is a Go `net/http` service. It owns request validation, arithmetic, error handling, and result serialization.
 - During development, Vite proxies `/api` requests to the Go service. `VITE_API_BASE_URL` can point production builds at an independently hosted backend.
 
@@ -61,11 +61,12 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 ├── AGENTS.md
 ├── AI_PROMPTS.md
 ├── PLAN.md
-├── .gitignore
+├── README.md
+├── docs/COVERAGE.md
 ├── go.work
 ├── package.json
 ├── backend/
-│   ├── go.mod
+│   ├── .env.example
 │   ├── calculator.go
 │   ├── calculator_test.go
 │   ├── handler.go
@@ -78,32 +79,22 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
     ├── eslint.config.js
     ├── index.html
     ├── package.json
-    ├── .env.example
-    ├── eslint.config.js
-    ├── vitest.config.ts
     ├── tsconfig.json
     ├── tsconfig.node.json
     ├── vite.config.ts
+    ├── vitest.config.ts
     └── src/
-        ├── api/
-        │   ├── calculator.test.ts
-        │   └── calculator.ts
-        ├── test/setup.ts
         ├── App.test.tsx
         ├── App.tsx
-        ├── App.test.tsx
         ├── api.ts
+        ├── main.tsx
         ├── setupTests.ts
         ├── styles.css
-        ├── main.tsx
-        ├── styles.css
-        ├── useCalculator.ts
         └── vite-env.d.ts
 ```
-
 ## Acceptance criteria
 
-- The repository contains the requested documentation and preserves both prompts.
+- The repository contains the requested handoff documentation and preserves the exact prompts used.
 - The frontend starts with Vite, submits all four operations to the backend, and renders backend results and structured errors.
 - The backend starts with only the Go standard library and serves health and versioned calculation endpoints.
 - The backend is the only source of arithmetic results.

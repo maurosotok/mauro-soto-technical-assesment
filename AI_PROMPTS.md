@@ -47,3 +47,34 @@
 > Do not add advanced operations, Docker, or broad refactors. Do not create a Git commit.
 >
 > Finish with a pass-or-fail result for every core requirement and list any unresolved evaluator risk.
+
+## Prompt 5
+
+> Read the original assignment and inspect the completed core application. Add this complete prompt to AI_PROMPTS.md as Prompt 5.
+>
+> Prepare the repository for evaluator handoff.
+>
+> Write a concise root README.md containing:
+>
+> Project overview and technology choices
+> Architecture and directory structure
+> Prerequisites
+> Exact backend and frontend setup instructions
+> How to run both applications
+> Environment variables
+> Successful and failing API examples
+> Test and coverage commands
+> Design decisions and assumptions
+> Important edge cases
+> Floating-point assumptions
+> Tradeoffs and future improvements
+>
+> Generate fresh coverage results and create docs/COVERAGE.md with the exact commands, actual current percentages, covered areas, and any intentional gaps. Do not invent or estimate coverage numbers.
+>
+> Confirm AI_PROMPTS.md contains the exact prompts actually used and add a short statement that I reviewed and tested all generated changes.
+>
+> Review .gitignore, remove dead or generated files, check for secrets and machine-specific paths, and verify that the README instructions work for a clean clone.
+>
+> Run every command documented in the README. Do not create a Git commit. Report any documentation problem corrected and the final coverage results.
+
+I reviewed and tested all generated changes.
