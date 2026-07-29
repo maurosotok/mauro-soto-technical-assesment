@@ -13,13 +13,22 @@ Calculator endpoint:
 
 `POST /api/v1/calculate`
 
-Request:
+Binary request:
 
 ```json
 {
   "left": 12.5,
   "operator": "add",
   "right": 3
+}
+```
+
+Unary square-root request (`right` must be omitted):
+
+```json
+{
+  "left": 81,
+  "operator": "square_root"
 }
 ```
 
@@ -37,7 +46,7 @@ Validation or arithmetic error (`400` or `422`):
 {
   "error": {
     "code": "unsupported_operation",
-    "message": "operator must be one of: add, subtract, multiply, divide"
+    "message": "operator must be one of: add, subtract, multiply, divide, power, square_root"
   }
 }
 ```
@@ -52,7 +61,7 @@ Runtime configuration:
 - `ALLOWED_ORIGIN` defaults to `http://localhost:5173`.
 - `VITE_API_BASE_URL` configures the frontend API origin; an empty value uses the Vite `/api` development proxy.
 
-Operands and results use Go `float64`. Requests with invalid or non-finite operands, division by zero, and calculations that produce a non-finite result are rejected with structured errors.
+Operands and results use Go `float64`. `power` is binary; `square_root` is unary and rejects a supplied `right` operand. Requests with invalid or non-finite operands, division by zero, negative square roots, and calculations that produce a non-finite result are rejected with structured errors.
 
 ## Directory structure
 
@@ -95,7 +104,7 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 ## Acceptance criteria
 
 - The repository contains the requested handoff documentation and preserves the exact prompts used.
-- The frontend starts with Vite, submits all four operations to the backend, and renders backend results and structured errors.
+- The frontend starts with Vite, submits all six operations to the backend, and renders backend results and structured errors.
 - The backend starts with only the Go standard library and serves health and versioned calculation endpoints.
 - The backend is the only source of arithmetic results.
 - Calculator service and HTTP error paths have focused table-driven tests.

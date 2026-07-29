@@ -92,3 +92,19 @@ I reviewed and tested all generated changes.
 > If Docker cannot be successfully tested in this environment, remove the unverified configuration and report that Docker was intentionally omitted.
 >
 > Do not create a Git commit.
+
+## Prompt 6B
+
+> Read the repository instructions and preserve the existing API and core behavior. Add this complete prompt to AI_PROMPTS.md as Prompt 6B.
+>
+> Add at most two advanced operations end to end: exponentiation and square root.
+>
+> Exponentiation is a binary operation. Square root is unary and must reject negative input using the existing structured error response.
+>
+> Extend the backend logic, validation, API tests, frontend controls, frontend tests, API documentation, and coverage report.
+>
+> Keep the responsive layout clear and do not weaken existing tests or validation. Do not add percentage unless enough time remains to define and document its exact behavior without ambiguity.
+>
+> Run every backend and frontend verification command. If this enhancement threatens core quality or the time limit, revert it completely and report that it was intentionally skipped.
+>
+> Do not create a Git commit.

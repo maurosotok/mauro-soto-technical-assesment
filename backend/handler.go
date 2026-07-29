@@ -82,20 +82,30 @@ func (a api) calculate(w http.ResponseWriter, r *http.Request) {
 		writeError(w, requestErr.status, requestErr.code, requestErr.message)
 		return
 	}
-	right, requestErr := parseOperand("right", request.Right)
-	if requestErr != nil {
-		writeError(w, requestErr.status, requestErr.code, requestErr.message)
-		return
+	var right float64
+	if operation == OperationSquareRoot {
+		if len(request.Right) != 0 {
+			writeError(w, http.StatusUnprocessableEntity, "unexpected_operand", "right operand must be omitted for square_root")
+			return
+		}
+	} else {
+		right, requestErr = parseOperand("right", request.Right)
+		if requestErr != nil {
+			writeError(w, requestErr.status, requestErr.code, requestErr.message)
+			return
+		}
 	}
 
 	result, err := a.calculator.Calculate(operation, left, right)
 	switch {
 	case errors.Is(err, ErrUnsupportedOperation):
-		writeError(w, http.StatusUnprocessableEntity, "unsupported_operation", "operator must be one of: add, subtract, multiply, divide")
+		writeError(w, http.StatusUnprocessableEntity, "unsupported_operation", "operator must be one of: add, subtract, multiply, divide, power, square_root")
 	case errors.Is(err, ErrNonFiniteOperand):
 		writeError(w, http.StatusUnprocessableEntity, "invalid_operand", "operands must be finite numbers")
 	case errors.Is(err, ErrDivisionByZero):
 		writeError(w, http.StatusUnprocessableEntity, "division_by_zero", "right operand must not be zero when dividing")
+	case errors.Is(err, ErrNegativeSquareRoot):
+		writeError(w, http.StatusUnprocessableEntity, "negative_square_root", "left operand must not be negative for square_root")
 	case errors.Is(err, ErrNonFiniteResult):
 		writeError(w, http.StatusUnprocessableEntity, "non_finite_result", "calculation result is not finite")
 	case err != nil:
@@ -112,7 +122,7 @@ func decodeCalculateRequest(body io.Reader) (calculateRequest, *requestError) {
 
 	if err := decoder.Decode(&request); err != nil {
 		code := "invalid_request"
-		message := "request body must be a JSON object with left, operator, and right fields"
+		message := "request body must be a JSON object with an operator and required operands"
 		if errors.Is(err, io.EOF) {
 			code = "malformed_json"
 			message = "request body must not be empty"
@@ -132,7 +142,7 @@ func decodeCalculateRequest(body io.Reader) (calculateRequest, *requestError) {
 		return calculateRequest{}, &requestError{
 			status:  http.StatusBadRequest,
 			code:    "invalid_request",
-			message: "request body must be a JSON object with left, operator, and right fields",
+			message: "request body must be a JSON object with an operator and required operands",
 		}
 	}
 

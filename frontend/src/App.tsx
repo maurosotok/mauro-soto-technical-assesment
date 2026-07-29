@@ -1,25 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { calculate, type Operation } from "./api";
+import {
+  calculate,
+  type BinaryOperation,
+  type CalculateRequest,
+} from "./api";
 import "./styles.css";
 
-const operationLabels: Record<Operation, string> = {
+const operationLabels: Record<BinaryOperation, string> = {
   add: "+",
   subtract: "−",
   multiply: "×",
   divide: "÷",
+  power: "xʸ",
 };
 
-const operationKeys: Record<string, Operation> = {
+const operationKeys: Record<string, BinaryOperation> = {
   "+": "add",
   "-": "subtract",
   "*": "multiply",
   "/": "divide",
+  "^": "power",
 };
 
 export function App() {
   const [display, setDisplay] = useState("0");
   const [leftOperand, setLeftOperand] = useState<string | null>(null);
-  const [operation, setOperation] = useState<Operation | null>(null);
+  const [operation, setOperation] = useState<BinaryOperation | null>(null);
   const [replaceDisplay, setReplaceDisplay] = useState(false);
   const [resultShown, setResultShown] = useState(false);
   const [error, setError] = useState("");
@@ -76,7 +82,7 @@ export function App() {
   }, [loading, replaceDisplay, resultShown]);
 
   const chooseOperation = useCallback(
-    (nextOperation: Operation) => {
+    (nextOperation: BinaryOperation) => {
       if (loading) return;
       setError("");
       setLeftOperand(display);
@@ -94,16 +100,12 @@ export function App() {
     setDisplay((current) => (current.length <= 1 ? "0" : current.slice(0, -1)));
   }, [loading, replaceDisplay, resultShown]);
 
-  const submit = useCallback(async () => {
-    if (loading || leftOperand === null || operation === null) return;
+  const runCalculation = useCallback(async (request: CalculateRequest) => {
+    if (loading) return;
     setLoading(true);
     setError("");
     try {
-      const response = await calculate({
-        left: Number(leftOperand),
-        operator: operation,
-        right: Number(display),
-      });
+      const response = await calculate(request);
       setDisplay(String(response.result));
       setLeftOperand(null);
       setOperation(null);
@@ -118,7 +120,23 @@ export function App() {
     } finally {
       setLoading(false);
     }
-  }, [display, leftOperand, loading, operation]);
+  }, [loading]);
+
+  const submit = useCallback(async () => {
+    if (leftOperand === null || operation === null) return;
+    await runCalculation({
+      left: Number(leftOperand),
+      operator: operation,
+      right: Number(display),
+    });
+  }, [display, leftOperand, operation, runCalculation]);
+
+  const submitSquareRoot = useCallback(async () => {
+    await runCalculation({
+      left: Number(display),
+      operator: "square_root",
+    });
+  }, [display, runCalculation]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -168,74 +186,23 @@ export function App() {
           {error}
         </p>
         <div className="keypad">
-          <button className="utility span-two" onClick={clear}>
-            Clear
-          </button>
-          <button
-            className="utility"
-            aria-label="Backspace"
-            onClick={backspace}
-          >
-            ⌫
-          </button>
-          <button
-            className="operator"
-            aria-label="Divide"
-            onClick={() => chooseOperation("divide")}
-          >
-            ÷
-          </button>
-          {["7", "8", "9"].map((digit) => (
-            <button key={digit} onClick={() => enterDigit(digit)}>
-              {digit}
-            </button>
-          ))}
-          <button
-            className="operator"
-            aria-label="Multiply"
-            onClick={() => chooseOperation("multiply")}
-          >
-            ×
-          </button>
-          {["4", "5", "6"].map((digit) => (
-            <button key={digit} onClick={() => enterDigit(digit)}>
-              {digit}
-            </button>
-          ))}
-          <button
-            className="operator"
-            aria-label="Subtract"
-            onClick={() => chooseOperation("subtract")}
-          >
-            −
-          </button>
-          {["1", "2", "3"].map((digit) => (
-            <button key={digit} onClick={() => enterDigit(digit)}>
-              {digit}
-            </button>
-          ))}
-          <button
-            className="operator"
-            aria-label="Add"
-            onClick={() => chooseOperation("add")}
-          >
-            +
-          </button>
-          <button className="span-two" onClick={() => enterDigit("0")}>
-            0
-          </button>
+          <button className="utility" onClick={clear}>Clear</button>
+          <button className="utility" aria-label="Backspace" onClick={backspace}>⌫</button>
+          <button className="operator" aria-label="Square root" disabled={loading} onClick={() => void submitSquareRoot()}>√</button>
+          <button className="operator" aria-label="Exponentiate" onClick={() => chooseOperation("power")}>xʸ</button>
+          {["7", "8", "9"].map((digit) => <button key={digit} onClick={() => enterDigit(digit)}>{digit}</button>)}
+          <button className="operator" aria-label="Divide" onClick={() => chooseOperation("divide")}>÷</button>
+          {["4", "5", "6"].map((digit) => <button key={digit} onClick={() => enterDigit(digit)}>{digit}</button>)}
+          <button className="operator" aria-label="Multiply" onClick={() => chooseOperation("multiply")}>×</button>
+          {["1", "2", "3"].map((digit) => <button key={digit} onClick={() => enterDigit(digit)}>{digit}</button>)}
+          <button className="operator" aria-label="Subtract" onClick={() => chooseOperation("subtract")}>−</button>
+          <button onClick={() => enterDigit("0")}>0</button>
           <button onClick={enterDecimal}>.</button>
-          <button
-            className="equals"
-            aria-label="Equals"
-            disabled={loading}
-            onClick={() => void submit()}
-          >
-            =
-          </button>
+          <button className="operator" aria-label="Add" onClick={() => chooseOperation("add")}>+</button>
+          <button className="equals" aria-label="Equals" disabled={loading} onClick={() => void submit()}>=</button>
         </div>
         <p className="hint">
-          Keyboard: 0–9, +, −, ×, ÷, Enter, Backspace, Escape
+          Keyboard: 0–9, +, −, ×, ÷, ^, Enter, Backspace, Escape
         </p>
       </section>
     </main>
