@@ -29,3 +29,20 @@
 > Run Go formatting, static checks, tests, and coverage. Fix failures before stopping. Do not modify the frontend unless the API contract requires a small documentation update.
 >
 > Do not create a Git commit. Report the API contract, changed files, test results, coverage, and design decisions I should understand for an interview.
+## Prompt 3
+
+> Read AGENTS.md, PLAN.md, and the implemented backend API before making changes. Add this complete prompt to AI_PROMPTS.md as Prompt 3.
+>
+> Implement a professional, responsive React TypeScript calculator. Include a readable display, digits, decimal input, addition, subtraction, multiplication, division, clear, backspace, and equals. Add basic keyboard support and accessible labels and focus behavior.
+>
+> The frontend must call the Go API when the user requests a result. Do not calculate final results locally, do not use eval, and do not duplicate backend arithmetic rules.
+>
+> Use a typed API client configured through VITE_API_BASE_URL. Keep API access, calculator state, and presentation reasonably separated without overengineering.
+>
+> Handle loading, API errors, network failures, division-by-zero feedback, decimal input, negative results, clearing, and starting a new calculation after a result.
+>
+> Add frontend tests with the API client mocked. Cover number entry, operation selection, the API request, result display, error display, clearing, and at least one keyboard interaction.
+>
+> Run linting, tests, coverage if configured, and a production build. Fix failures before stopping.
+>
+> Do not create a Git commit. Report changed files, command results, coverage, and remaining manual browser checks.
