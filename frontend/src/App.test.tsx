@@ -83,6 +83,13 @@ describe("App", () => {
     expect(screen.getByTestId("display")).toHaveTextContent("4.5");
   });
 
+  it("ignores spacebar keyboard input", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.keyboard("8{Space}");
+    expect(screen.getByTestId("display")).toHaveTextContent("8");
+  });
+
   it("starts a second calculation from the backend result", async () => {
     vi.mocked(fetch)
       .mockReturnValueOnce(jsonResponse({ result: 5 }))
