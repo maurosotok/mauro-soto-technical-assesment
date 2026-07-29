@@ -3,7 +3,7 @@
 ## Proposed architecture
 
 - A small npm-workspaces monorepo with `frontend` and `backend` applications.
-- The frontend is a Vite-powered React TypeScript single page that will collect operands and an operation, call the backend, and render its response.
+- The frontend is a responsive Vite-powered React TypeScript calculator with a typed API client, a focused state hook, and presentational components.
 - The backend is a Go `net/http` service. It owns request validation, arithmetic, error handling, and result serialization.
 - During development, Vite proxies `/api` requests to the Go service. `VITE_API_BASE_URL` can point production builds at an independently hosted backend.
 
@@ -50,6 +50,7 @@ Runtime configuration:
 
 - `PORT` defaults to `8080`.
 - `ALLOWED_ORIGIN` defaults to `http://localhost:5173`.
+- `VITE_API_BASE_URL` configures the frontend API origin; an empty value uses the Vite `/api` development proxy.
 
 Operands and results use Go `float64`. Requests with invalid or non-finite operands, division by zero, and calculations that produce a non-finite result are rejected with structured errors.
 
@@ -73,6 +74,8 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 │   ├── server.go
 │   └── server_test.go
 └── frontend/
+    ├── .env.example
+    ├── eslint.config.js
     ├── index.html
     ├── package.json
     ├── .env.example
@@ -82,12 +85,19 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
     ├── tsconfig.node.json
     ├── vite.config.ts
     └── src/
+        ├── api/
+        │   ├── calculator.test.ts
+        │   └── calculator.ts
+        ├── test/setup.ts
+        ├── App.test.tsx
         ├── App.tsx
         ├── App.test.tsx
         ├── api.ts
         ├── setupTests.ts
         ├── styles.css
         ├── main.tsx
+        ├── styles.css
+        ├── useCalculator.ts
         └── vite-env.d.ts
 ```
 
@@ -98,7 +108,7 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 - The backend starts with only the Go standard library and serves health and versioned calculation endpoints.
 - The backend is the only source of arithmetic results.
 - Calculator service and HTTP error paths have focused table-driven tests.
-- TypeScript strict checks and the frontend production build pass.
+- Frontend linting, behavior tests, coverage, strict TypeScript checks, and the production build pass.
 - Go formatting, static checks, tests, and coverage checks pass.
 - Generated dependencies, build artifacts, environment files, and editor/OS noise are ignored.
 - No Git commit is created for this implementation step.
@@ -107,7 +117,7 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 
 - Binary floating-point is compact and dependency-free but does not provide decimal financial semantics.
 - Very large finite operands can overflow; the service explicitly rejects non-finite results.
-- CORS allows one configured frontend origin and must be configured correctly outside local development.
+- CORS and `VITE_API_BASE_URL` must target the deployed frontend and backend origins outside local development.
 - Time can be lost on styling or abstractions that do not improve the assessed behavior.
 
 ## Four-hour time budget

@@ -29,6 +29,7 @@
 > Run Go formatting, static checks, tests, and coverage. Fix failures before stopping. Do not modify the frontend unless the API contract requires a small documentation update.
 >
 > Do not create a Git commit. Report the API contract, changed files, test results, coverage, and design decisions I should understand for an interview.
+
 ## Prompt 4
 
 > Read the repository instructions and inspect the current implementation. Add this complete prompt to AI_PROMPTS.md as Prompt 4.
