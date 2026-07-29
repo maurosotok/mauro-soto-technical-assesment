@@ -4,14 +4,14 @@
 
 - A small npm-workspaces monorepo with `frontend` and `backend` applications.
 - The frontend is a Vite-powered React TypeScript single page that will collect operands and an operation, call the backend, and render its response.
-- The backend is a Go `net/http` service. It will own request validation, arithmetic, error handling, and result serialization.
-- During development, Vite will proxy `/api` requests to the Go service. This avoids frontend environment-specific URLs and local CORS configuration.
+- The backend is a Go `net/http` service. It owns request validation, arithmetic, error handling, and result serialization.
+- During development, Vite proxies `/api` requests to the Go service. This avoids frontend environment-specific URLs and local CORS configuration.
 
 ## API contract
 
-Planned calculator endpoint (not part of the initial scaffold):
+Calculator endpoint:
 
-`POST /api/calculate`
+`POST /api/v1/calculate`
 
 Request:
 
@@ -36,17 +36,22 @@ Validation or arithmetic error (`400` or `422`):
 ```json
 {
   "error": {
-    "code": "invalid_operation",
+    "code": "unsupported_operation",
     "message": "operator must be one of: add, subtract, multiply, divide"
   }
 }
 ```
 
-Operational endpoint included in the scaffold:
+Operational endpoint:
 
 - `GET /api/health` returns `{"status":"ok"}`.
 
-The exact numeric representation and edge-case policy (division by zero, overflow, and precision) will be decided before implementing the calculator endpoint.
+Runtime configuration:
+
+- `PORT` defaults to `8080`.
+- `ALLOWED_ORIGIN` defaults to `http://localhost:5173`.
+
+Operands and results use Go `float64`. Requests with invalid or non-finite operands, division by zero, and calculations that produce a non-finite result are rejected with structured errors.
 
 ## Directory structure
 
@@ -60,11 +65,16 @@ The exact numeric representation and edge-case policy (division by zero, overflo
 ├── package.json
 ├── backend/
 │   ├── go.mod
-│   └── main.go
+│   ├── calculator.go
+│   ├── calculator_test.go
+│   ├── handler.go
+│   ├── handler_test.go
+│   ├── main.go
+│   ├── server.go
+│   └── server_test.go
 └── frontend/
     ├── index.html
-    ├── go.work
-├── package.json
+    ├── package.json
     ├── tsconfig.json
     ├── tsconfig.node.json
     ├── vite.config.ts
@@ -76,20 +86,21 @@ The exact numeric representation and edge-case policy (division by zero, overflo
 
 ## Acceptance criteria
 
-- The repository contains the requested documentation and preserves the original prompt.
+- The repository contains the requested documentation and preserves both prompts.
 - The frontend starts with Vite and renders a placeholder page.
-- The backend starts with only the Go standard library and serves its health endpoint.
-- No calculator UI, arithmetic endpoint, or arithmetic logic exists yet.
+- The backend starts with only the Go standard library and serves health and versioned calculation endpoints.
+- The backend is the only source of arithmetic results.
+- Calculator service and HTTP error paths have focused table-driven tests.
 - TypeScript strict checks and the frontend production build pass.
-- Go tests/build checks pass once a Go toolchain is available.
+- Go formatting, static checks, tests, and coverage checks pass.
 - Generated dependencies, build artifacts, environment files, and editor/OS noise are ignored.
-- No Git commit is created.
+- No Git commit is created for this implementation step.
 
 ## Risks
 
-- The assessment's unstated calculator rules may affect the API's numeric representation and error behavior.
-- Floating-point expectations may require a decimal strategy; decide this before implementation rather than changing the contract late.
-- A missing local Go toolchain blocks runtime verification of the backend.
+- Binary floating-point is compact and dependency-free but does not provide decimal financial semantics.
+- Very large finite operands can overflow; the service explicitly rejects non-finite results.
+- CORS allows one configured frontend origin and must be configured correctly outside local development.
 - Time can be lost on styling or abstractions that do not improve the assessed behavior.
 
 ## Four-hour time budget
