@@ -21,6 +21,5 @@ button:disabled { cursor: wait; opacity: .6; }
 .utility { color: #c4cde1; background: #293247; }
 .operator { color: #dce5ff; background: #354c86; }
 .equals { color: #081127; background: #89aaff; }
-.span-two { grid-column: span 2; }
 .hint { margin: 16px 0 0; color: #8f9bb2; font-size: .75rem; text-align: center; }
 @media (max-width: 350px) { .page-shell { padding: 0; } .calculator { min-height: 100vh; padding: 16px 12px; border: 0; border-radius: 0; } .keypad { gap: 7px; } button { min-height: 52px; } }

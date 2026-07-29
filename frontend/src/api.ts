@@ -1,10 +1,10 @@
-export type Operation = "add" | "subtract" | "multiply" | "divide";
+export type BinaryOperation = "add" | "subtract" | "multiply" | "divide" | "power";
+export type UnaryOperation = "square_root";
+export type Operation = BinaryOperation | UnaryOperation;
 
-export interface CalculateRequest {
-  left: number;
-  operator: Operation;
-  right: number;
-}
+export type CalculateRequest =
+  | { left: number; operator: BinaryOperation; right: number }
+  | { left: number; operator: UnaryOperation };
 
 export interface CalculateResponse {
   result: number;

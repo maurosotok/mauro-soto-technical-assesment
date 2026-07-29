@@ -18,6 +18,7 @@ describe("App", () => {
     { left: "2", operator: "Subtract", right: "5", operation: "subtract", result: -3 },
     { left: "2.5", operator: "Multiply", right: "4", operation: "multiply", result: 10 },
     { left: "7.5", operator: "Divide", right: "2.5", operation: "divide", result: 3 },
+    { left: "2", operator: "Exponentiate", right: "3", operation: "power", result: 8 },
   ])("submits $operation to the backend and displays its result", async ({ left, operator, right, operation, result }) => {
     vi.mocked(fetch).mockReturnValueOnce(jsonResponse({ result }));
     const user = userEvent.setup();
@@ -35,6 +36,34 @@ describe("App", () => {
     }));
   });
 
+  it("submits square root as a unary operation", async () => {
+    vi.mocked(fetch).mockReturnValueOnce(jsonResponse({ result: 3 }));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard("9");
+    await user.click(screen.getByRole("button", { name: "Square root" }));
+
+    expect(await screen.findByTestId("display")).toHaveTextContent("3");
+    expect(fetch).toHaveBeenCalledWith("/api/v1/calculate", expect.objectContaining({
+      body: JSON.stringify({ left: 9, operator: "square_root" }),
+    }));
+  });
+
+  it("shows the backend error for a negative square root", async () => {
+    vi.mocked(fetch)
+      .mockReturnValueOnce(jsonResponse({ result: -3 }))
+      .mockReturnValueOnce(jsonResponse({ error: { code: "negative_square_root", message: "left operand must not be negative for square_root" } }, 422));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.keyboard("2-5{Enter}");
+    await waitFor(() => expect(screen.getByTestId("display")).toHaveTextContent("-3"));
+    await user.click(screen.getByRole("button", { name: "Square root" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("left operand must not be negative for square_root");
+    expect(vi.mocked(fetch).mock.calls[1][1]?.body).toBe(JSON.stringify({ left: -3, operator: "square_root" }));
+  });
   it("shows the backend division-by-zero message", async () => {
     vi.mocked(fetch).mockReturnValueOnce(jsonResponse({ error: { code: "division_by_zero", message: "right operand must not be zero when dividing" } }, 422));
     const user = userEvent.setup();

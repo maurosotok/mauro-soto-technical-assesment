@@ -54,6 +54,8 @@ func TestCalculateHandlerSuccess(t *testing.T) {
 		{name: "subtracts negative", body: `{"left":4,"operator":"subtract","right":-3}`, want: 7},
 		{name: "multiplies negative", body: `{"left":-2.5,"operator":"multiply","right":4}`, want: -10},
 		{name: "divides decimals", body: `{"left":7.5,"operator":"divide","right":2.5}`, want: 3},
+		{name: "raises to a power", body: `{"left":2,"operator":"power","right":3}`, want: 8},
+		{name: "calculates square root", body: `{"left":81,"operator":"square_root"}`, want: 9},
 	}
 
 	handler := newHTTPHandler(Calculator{}, defaultAllowedOrigin)
@@ -102,10 +104,13 @@ func TestCalculateHandlerRequestErrors(t *testing.T) {
 		{name: "unsupported operator", method: http.MethodPost, body: `{"left":1,"operator":"modulo","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "unsupported_operation"},
 		{name: "missing left operand", method: http.MethodPost, body: `{"operator":"add","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "missing_operand"},
 		{name: "missing right operand", method: http.MethodPost, body: `{"left":1,"operator":"add"}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "missing_operand"},
+		{name: "missing power exponent", method: http.MethodPost, body: `{"left":2,"operator":"power"}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "missing_operand"},
+		{name: "unexpected square root right operand", method: http.MethodPost, body: `{"left":9,"operator":"square_root","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "unexpected_operand"},
 		{name: "null operand", method: http.MethodPost, body: `{"left":null,"operator":"add","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "invalid_operand"},
 		{name: "string operand", method: http.MethodPost, body: `{"left":"1","operator":"add","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "invalid_operand"},
 		{name: "non-finite operand", method: http.MethodPost, body: `{"left":1e400,"operator":"add","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "invalid_operand"},
 		{name: "division by zero", method: http.MethodPost, body: `{"left":1,"operator":"divide","right":0}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "division_by_zero"},
+		{name: "negative square root", method: http.MethodPost, body: `{"left":-1,"operator":"square_root"}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "negative_square_root"},
 		{name: "non-finite result", method: http.MethodPost, body: `{"left":1.7976931348623157e308,"operator":"multiply","right":2}`, wantStatus: http.StatusUnprocessableEntity, wantCode: "non_finite_result"},
 	}
 

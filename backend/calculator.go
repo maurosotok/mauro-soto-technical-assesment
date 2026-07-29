@@ -8,23 +8,26 @@ import (
 type Operation string
 
 const (
-	OperationAdd      Operation = "add"
-	OperationSubtract Operation = "subtract"
-	OperationMultiply Operation = "multiply"
-	OperationDivide   Operation = "divide"
+	OperationAdd        Operation = "add"
+	OperationSubtract   Operation = "subtract"
+	OperationMultiply   Operation = "multiply"
+	OperationDivide     Operation = "divide"
+	OperationPower      Operation = "power"
+	OperationSquareRoot Operation = "square_root"
 )
 
 var (
 	ErrUnsupportedOperation = errors.New("unsupported operation")
 	ErrNonFiniteOperand     = errors.New("operands must be finite")
 	ErrDivisionByZero       = errors.New("division by zero")
+	ErrNegativeSquareRoot   = errors.New("square root operand must not be negative")
 	ErrNonFiniteResult      = errors.New("result is not finite")
 )
 
 type Calculator struct{}
 
 func (Calculator) Calculate(operation Operation, left, right float64) (float64, error) {
-	if !isFinite(left) || !isFinite(right) {
+	if !isFinite(left) || (operation != OperationSquareRoot && !isFinite(right)) {
 		return 0, ErrNonFiniteOperand
 	}
 
@@ -41,6 +44,13 @@ func (Calculator) Calculate(operation Operation, left, right float64) (float64, 
 			return 0, ErrDivisionByZero
 		}
 		result = left / right
+	case OperationPower:
+		result = math.Pow(left, right)
+	case OperationSquareRoot:
+		if left < 0 {
+			return 0, ErrNegativeSquareRoot
+		}
+		result = math.Sqrt(left)
 	default:
 		return 0, ErrUnsupportedOperation
 	}

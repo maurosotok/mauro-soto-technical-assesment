@@ -75,6 +75,7 @@ docker compose down
 ```
 
 No secrets or local environment files are copied into the images. Compose supplies only the backend port and allowed browser origin.
+
 ## Environment variables
 
 | Variable | Application | Default | Purpose |
@@ -95,6 +96,18 @@ curl -i -X POST http://localhost:8080/api/v1/calculate -H "Content-Type: applica
 
 The response is HTTP `200` with `{"result":3.75}`.
 
+Exponentiation is binary:
+
+```sh
+curl -i -X POST http://localhost:8080/api/v1/calculate -H "Content-Type: application/json" -d '{"left":2,"operator":"power","right":3}'
+```
+
+Square root is unary, so `right` must be omitted:
+
+```sh
+curl -i -X POST http://localhost:8080/api/v1/calculate -H "Content-Type: application/json" -d '{"left":81,"operator":"square_root"}'
+```
+
 Failing division by zero:
 
 ```sh
@@ -103,7 +116,13 @@ curl -i -X POST http://localhost:8080/api/v1/calculate -H "Content-Type: applica
 
 The response is HTTP `422` with `{"error":{"code":"division_by_zero","message":"right operand must not be zero when dividing"}}`.
 
-Supported operators are `add`, `subtract`, `multiply`, and `divide`. `GET /api/health` returns `{"status":"ok"}`.
+A negative square root also returns HTTP `422` with code `negative_square_root`:
+
+```sh
+curl -i -X POST http://localhost:8080/api/v1/calculate -H "Content-Type: application/json" -d '{"left":-1,"operator":"square_root"}'
+```
+
+Supported operators are `add`, `subtract`, `multiply`, `divide`, `power`, and `square_root`. `GET /api/health` returns `{"status":"ok"}`.
 
 ## Verification and coverage
 
@@ -134,7 +153,7 @@ A successful `gofmt -l backend` prints nothing. Current measured coverage and sc
 
 ## Edge cases
 
-The backend rejects malformed or trailing JSON, unknown fields, missing or invalid operands, unsupported operations, incorrect methods, non-finite operands/results, oversized bodies, and division by positive or negative zero. The UI supports decimals, negative results, keyboard entry, clear, backspace, a new calculation after a result, loading feedback, backend errors, and narrow mobile layouts.
+The backend rejects malformed or trailing JSON, unknown fields, missing or invalid operands, unsupported operations, incorrect methods, non-finite operands/results, oversized bodies, and division by positive or negative zero, negative square roots, extra unary operands, and non-real or overflowing power results. The UI supports decimals, negative results, keyboard entry, clear, backspace, a new calculation after a result, loading feedback, backend errors, and narrow mobile layouts.
 
 ## Floating-point assumptions
 
@@ -142,4 +161,4 @@ Operands and results are IEEE-754 `float64` values. This is appropriate for a ge
 
 ## Tradeoffs and future improvements
 
-The project favors reviewability and the four-hour scope over deployment infrastructure and advanced features. Given more time, useful improvements would include end-to-end browser tests in CI, configurable multi-origin CORS, request logging/observability, decimal or arbitrary-precision modes for specialized domains, and production TLS/orchestration configuration. Advanced operations and frontend arithmetic fall outside the assignment.
+The project favors reviewability and the four-hour scope over deployment infrastructure and advanced features. Given more time, useful improvements would include end-to-end browser tests in CI, configurable multi-origin CORS, request logging/observability, decimal or arbitrary-precision modes for specialized domains, and production TLS/orchestration configuration. Percentage and frontend arithmetic remain outside the assignment.
