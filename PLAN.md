@@ -5,7 +5,7 @@
 - A small npm-workspaces monorepo with `frontend` and `backend` applications.
 - The frontend is a Vite-powered React TypeScript single page that will collect operands and an operation, call the backend, and render its response.
 - The backend is a Go `net/http` service. It owns request validation, arithmetic, error handling, and result serialization.
-- During development, Vite proxies `/api` requests to the Go service. This avoids frontend environment-specific URLs and local CORS configuration.
+- During development, Vite proxies `/api` requests to the Go service. `VITE_API_BASE_URL` can point production builds at an independently hosted backend.
 
 ## API contract
 
@@ -75,11 +75,18 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 └── frontend/
     ├── index.html
     ├── package.json
+    ├── .env.example
+    ├── eslint.config.js
+    ├── vitest.config.ts
     ├── tsconfig.json
     ├── tsconfig.node.json
     ├── vite.config.ts
     └── src/
         ├── App.tsx
+        ├── App.test.tsx
+        ├── api.ts
+        ├── setupTests.ts
+        ├── styles.css
         ├── main.tsx
         └── vite-env.d.ts
 ```
@@ -87,7 +94,7 @@ Operands and results use Go `float64`. Requests with invalid or non-finite opera
 ## Acceptance criteria
 
 - The repository contains the requested documentation and preserves both prompts.
-- The frontend starts with Vite and renders a placeholder page.
+- The frontend starts with Vite, submits all four operations to the backend, and renders backend results and structured errors.
 - The backend starts with only the Go standard library and serves health and versioned calculation endpoints.
 - The backend is the only source of arithmetic results.
 - Calculator service and HTTP error paths have focused table-driven tests.

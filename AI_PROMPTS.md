@@ -29,3 +29,20 @@
 > Run Go formatting, static checks, tests, and coverage. Fix failures before stopping. Do not modify the frontend unless the API contract requires a small documentation update.
 >
 > Do not create a Git commit. Report the API contract, changed files, test results, coverage, and design decisions I should understand for an interview.
+## Prompt 4
+
+> Read the repository instructions and inspect the current implementation. Add this complete prompt to AI_PROMPTS.md as Prompt 4.
+>
+> Run the frontend and backend together and complete the core integration.
+>
+> Verify all four operations through the browser, including decimals, negative results, division by zero, clear, backspace, keyboard input, a second calculation after a result, and the behavior when the backend is unavailable.
+>
+> Fix only concrete integration problems such as CORS configuration, API base URL handling, inconsistent error messages, loading behavior, focus behavior, or narrow mobile layout issues. Add example environment files where needed.
+>
+> Confirm through inspection that the frontend does not contain final arithmetic implementation and that the API contract is consistent across implementation, types, tests, and documentation.
+>
+> Re-run every backend formatting, static-analysis, test, and coverage command. Re-run every frontend lint, test, coverage, and production-build command.
+>
+> Do not add advanced operations, Docker, or broad refactors. Do not create a Git commit.
+>
+> Finish with a pass-or-fail result for every core requirement and list any unresolved evaluator risk.
